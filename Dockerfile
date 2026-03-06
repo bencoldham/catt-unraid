@@ -7,3 +7,7 @@ RUN apt-get update && apt-get install -y \
 RUN pip install catt
 
 ENTRYPOINT ["tail", "-f", "/dev/null"]
+
+# Create a symlink pointing expected catt config ->  unraid config
+RUN mkdir -p /root/.config
+RUN ln -s /config /root/.config/catt
