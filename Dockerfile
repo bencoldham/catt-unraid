@@ -11,3 +11,9 @@ ENTRYPOINT ["tail", "-f", "/dev/null"]
 # Create a symlink pointing expected catt config ->  unraid config
 RUN mkdir -p /root/.config
 RUN ln -s /config /root/.config/catt
+
+COPY main.py /app/main.py
+WORKDIR /app
+
+EXPOSE 5000
+CMD ["python", "main.py"]
