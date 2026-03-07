@@ -29,15 +29,17 @@ def parse_env_vars() -> EnvVars:
 
 
 def parse_device_to_url(cfg_str: str) -> dict[str, str]:
-    """Parse the string to a dictionary with pairs <device> : <url to cast to device>."""
+    """Parse the str to a dictionary with pairs <device> : <url to cast to device>."""
 
     def _strip(string: str) -> str:
         return string.strip("'").strip('"').strip()
 
     device_to_url: dict[str, str] = {}
     parts = cfg_str.split(",")
+
     for part in parts:
         if "=" in part:
             device, url = part.split("=", 1)
             device_to_url[_strip(device)] = _strip(url)
+
     return device_to_url

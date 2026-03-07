@@ -31,6 +31,7 @@ class CastDevice:
                 )  # pyright: ignore[reportAttributeAccessIssue]
                 logger.info(f"Successfully connected to {self.device_ip}.")
                 self.force_restart()
+
             except Exception as e:
                 logger.error(f"Could not connect to {self.device_ip}. {e}")
                 raise ConnectionError(e) from e
@@ -45,6 +46,7 @@ class CastDevice:
             msg = f"{self.device_ip} is not on url or is idle. \
                      Killing the non-url app and recasting."
             logger.info(msg)
+
         self.controller.kill(idle_only=True)
 
     def force_restart(self) -> None:
