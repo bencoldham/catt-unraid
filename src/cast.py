@@ -2,6 +2,7 @@
 
 import time
 from concurrent.futures import ThreadPoolExecutor
+from typing import cast
 
 from catt.controllers import DashCastController, setup_cast
 from loguru import logger
@@ -13,22 +14,21 @@ class CastDevice:
     """Logic to manage a single Chromecast device."""
 
     device_to_url: dict[str, str]
-    controller: DashCastController
+    _no_con_msg: str = (
+        "`controller` attribute does not exist."
+        "Run CastDevice.connect() to initialise the controller."
+    )
 
     def __init__(self, device_ip: str, url: str) -> None:
         self.device_ip = device_ip
         self.url = url
+        self.controller: DashCastController | None = None
 
     def connect(self) -> None:
         """Attempt connection to the device."""
-        if not getattr(self, "controller", None):
+        if self.controller is None:
             try:
-                self.controller = setup_cast(
-                    self.device_ip,
-                    controller="dashcast",
-                    action="load_url",
-                    prep="app",
-                )  # pyright: ignore[reportAttributeAccessIssue]
+                self.controller = self._setup_cast(self.device_ip)
                 logger.info(f"Successfully connected to {self.device_ip}.")
                 self.force_restart()
 
@@ -38,10 +38,16 @@ class CastDevice:
 
     def cast(self) -> None:
         """Cast the url to the device."""
+        if self.controller is None:
+            raise ValueError(self._no_con_msg)
+
         self.controller.load_url(self.url)
 
     def kill_if_idle(self) -> None:
         """Kill the non-url apps on the device."""
+        if self.controller is None:
+            raise ValueError(self._no_con_msg)
+
         if self.controller._is_idle:  # noqa: SLF001
             msg = f"{self.device_ip} is not on url or is idle. \
                      Killing the non-url app and recasting."
@@ -51,9 +57,24 @@ class CastDevice:
 
     def force_restart(self) -> None:
         """Force kill the existing cast for fresh state."""
+        if self.controller is None:
+            raise AttributeError(self._no_con_msg)
+
         logger.info(f"Clearing {self.device_ip}.")
         self.controller.prep_app()
         time.sleep(5)
+
+    @staticmethod
+    def _setup_cast(device_ip: str) -> DashCastController:
+        response = setup_cast(
+            device_ip,
+            controller="dashcast",
+            action="load_url",
+            prep="app",
+        )
+        # Handle catt.setup_cast() sometimes returning tuple
+        response = response[0] if isinstance(response, tuple) else response
+        return cast("DashCastController", response)
 
 
 class CastManager:
