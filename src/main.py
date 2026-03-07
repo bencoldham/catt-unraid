@@ -10,6 +10,8 @@ from env_vars import EnvVars, parse_env_vars
 
 
 class CastDevice:
+    """Logic to manage a single Chromecast device."""
+
     device_to_url: dict[str, str]
     controller: DashCastController
 
@@ -17,53 +19,79 @@ class CastDevice:
         self.device_ip = device_ip
         self.url = url
 
-    def connect(self):
+    def connect(self) -> None:
+        """Attempt connection to the device."""
         if not getattr(self, "controller", None):
-            self.controller = setup_cast(
-                self.device_ip,
-                controller="dashcast",
-                action="load_url",
-                prep="app",
-            )  # pyright: ignore[reportAttributeAccessIssue]
-            self.force_restart()
+            try:
+                self.controller = setup_cast(
+                    self.device_ip,
+                    controller="dashcast",
+                    action="load_url",
+                    prep="app",
+                )  # pyright: ignore[reportAttributeAccessIssue]
+                logger.info(f"Successfully connected to {self.device_ip}.")
+                self.force_restart()
+            except Exception as e:
+                logger.error(f"Could not connect to {self.device_ip}. {e}")
+                raise ConnectionError(e) from e
 
     def cast(self) -> None:
+        """Cast the url to the device."""
+        logger.info(f"Casting {self.url} to {self.device_ip}.")
         self.controller.load_url(self.url)
 
-    def recast(self) -> None:
+    def kill_if_idle(self) -> None:
+        """Kill the non-url apps on the device."""
         self.controller.kill(idle_only=True)
 
     def force_restart(self):
-        """Force kill the existing cast."""
+        """Force kill the existing cast for fresh state."""
         self.controller.kill(force=True)
         time.sleep(5)
 
 
 class CastManager:
+    """Manager to orchestrate casting for all devices."""
+
     def __init__(self, env: EnvVars):
         self.env = env
         self.devices = self._init_devices(env.device_to_url)
 
-    def run(self):
-        """Spawns threads for all devices and keeps running"""
+    def run(self) -> None:
+        """Spawn a thread for each device and continually cast."""
         logger.info(f"Manager starting with {len(self.devices)} devices.")
+
         with ThreadPoolExecutor(max_workers=len(self.devices)) as executor:
-            for device in self.devices:
-                executor.submit(self._loop_device, device)
+            executor.map(self.safe_loop, self.devices)
+
+    def safe_loop(self, device: CastDevice) -> None:
+        """Continuously loop a single thread, recovering if lost."""
+        while True:
+            try:
+                self.recast_device(device)
+            except Exception as e:
+                msg = f"Thread for {device.device_ip} CRASHED: {e}. Restarting loop..."
+                logger.error(msg)
+                time.sleep(5)
+
+    def recast_device(self, device: CastDevice) -> None:
+        """Automatically recover the connection if lost or chromecast goes idle."""
+        device.connect()
+        device.cast()
+        time.sleep(self.env.recast_interval)
+        device.kill_if_idle()
 
     @staticmethod
     def _init_devices(device_to_url: dict[str, str]) -> tuple[CastDevice, ...]:
         return tuple(CastDevice(ip, url) for ip, url in device_to_url.items())
 
-    def _loop_device(self, device: CastDevice):
-        """The infinite loop for a single thread."""
-        while True:
-            device.cast()
-            time.sleep(self.env.recast_interval)
-            device.recast()
 
-
-if __name__ == "__main__":
+def main() -> None:
+    """Main orchestrator."""
     env = parse_env_vars()
     manager = CastManager(env)
     manager.run()
+
+
+if __name__ == "__main__":
+    main()
