@@ -1,3 +1,5 @@
+"""Handle env vars passed through Unraid."""
+
 import os
 from dataclasses import dataclass
 
@@ -17,7 +19,8 @@ def parse_env_vars() -> EnvVars:
     device_to_url_str = os.environ.get("DEVICE_TO_URL")
 
     if not device_to_url_str:
-        raise ValueError("`DEVICE_TO_URL` must be set aas an env var.")
+        msg = "`DEVICE_TO_URL` must be set aas an env var."
+        raise ValueError(msg)
 
     device_to_url = parse_device_to_url(device_to_url_str)
     recast_interval = int(os.environ.get("RECAST_INTERVAL", DEFAULT_RECAST_INTERVAL))
