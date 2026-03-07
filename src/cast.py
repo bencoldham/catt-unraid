@@ -69,7 +69,7 @@ class CastManager:
         while True:
             try:
                 self.recast_device(device)
-            except Exception as e:
+            except Exception as e:  # noqa: BLE001, PERF203
                 msg = f"Thread for {device.device_ip} CRASHED: {e}. Restarting loop..."
                 logger.error(msg)
                 time.sleep(5)

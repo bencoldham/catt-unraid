@@ -5,7 +5,5 @@ services:
     network_mode: host
     volumes:
       - ./config_test:/config
-      - ./src:/app
     environment:
       - PYTHONUNBUFFERED=1
-      - DEVICE_TO_URL="192.168.20.18=https://youtube.com"

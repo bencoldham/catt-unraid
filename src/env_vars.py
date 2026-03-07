@@ -19,7 +19,7 @@ def parse_env_vars() -> EnvVars:
     device_to_url_str = os.environ.get("DEVICE_TO_URL")
 
     if not device_to_url_str:
-        msg = "`DEVICE_TO_URL` must be set aas an env var."
+        msg = "`DEVICE_TO_URL` must be set as an env var."
         raise ValueError(msg)
 
     device_to_url = parse_device_to_url(device_to_url_str)

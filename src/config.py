@@ -1,9 +1,9 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
-from loguru import logger
+
 from dataclasses import dataclass
-from catt.discovery import get_cast_infos, get_casts
-from catt.cli import scan
+from typing import TYPE_CHECKING
+
+from loguru import logger
 
 if TYPE_CHECKING:
     from pathlib import Path

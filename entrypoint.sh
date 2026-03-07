@@ -3,4 +3,4 @@ echo "Scanning for devices..."
 catt scan
 
 echo "Starting application..."
-exec python main.py
+exec python src/main.py

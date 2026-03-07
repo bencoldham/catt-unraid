@@ -13,11 +13,11 @@ ENV UV_PROJECT_ENVIRONMENT="/usr/local"
 WORKDIR /app
 COPY pyproject.toml uv.lock ./
 RUN uv sync --no-dev --no-install-project
+COPY . . 
 
 # Create a symlink pointing expected catt config ->  unraid config
 RUN mkdir -p /root/.config
 RUN ln -s /config /root/.config/catt
-
 
 # Run the container.
 COPY entrypoint.sh /entrypoint.sh
