@@ -2,6 +2,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from loguru import logger
 from dataclasses import dataclass
+from catt.discovery import get_cast_infos, get_casts
+from catt.cli import scan
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -15,14 +17,14 @@ class CattSettings:
 
 
 def build_cfg(settings: CattSettings):
-    make_cfg_file(settings.config_path)
+    create_cfg_file(settings.config_path)
     config_string = make_config_string(settings.device_map, settings.default_device)
-    logger.info(f"Saving config:\n {config_string} to {settings.config_path}")
+    logger.info(f"Saving config to {settings.config_path}:\n {config_string}")
     with settings.config_path.open("w") as f:
         f.write(config_string)
 
 
-def make_cfg_file(config_path: Path) -> None:
+def create_cfg_file(config_path: Path) -> None:
     """Make the config file if it doesn't already exist."""
     if config_path.exists():
         logger.info(f"Config already exists, skipping create: {config_path}")
