@@ -1,7 +1,7 @@
 import os
 from dataclasses import dataclass
 
-from constants import DEFAULT_RECAST_INTERVAL
+from const import DEFAULT_RECAST_INTERVAL
 
 
 @dataclass
