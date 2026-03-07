@@ -2,7 +2,7 @@
 
 Intended to repurpose Nest Hub/Chromecast devices to dedicated virtual kiosks for Bitfocus Companion. However it can be used to continually cast any URL.
 
-This was built because after endless amounts of trial and error, I could not reliably cast Bitfocus dashboards from Home Assistant directly. 
+This was built because after endless amounts of trial and error, I could not reliably cast Bitfocus dashboards from Home Assistant directly. CATT in Home Assistant is notoriously hacky, especially with Supervisor given it is a managed environment.
 
 This container aims to subvert all the strange intricacies that occur in HA casting to make Nest Hubs actually reliable as a dashboard.
 
@@ -11,8 +11,9 @@ My real-world testing thus far has proven a highly reliable and snappy experienc
 Developed for deployment as an **Unraid Docker container**, but can be containerised on any platform.
 
 ## Getting Started
-
+#### **IMPORTANT**
 ### Host mode
+
 The **Network Type** must be set to `Host`. This is required for the script to discover Chromecast devices on your local network.
 
 ### Variables
@@ -21,7 +22,7 @@ The following environment variables are required in setup:
 | Key | Default | Description |
 | :--- | :--- | :--- |
 | `DEVICE_TO_URL` | *Required* | A comma-separated list of device IPs and their corresponding URLs. |
-| `RECAST_INTERVAL` | 60| How often (in seconds) the script should refresh or check the cast.|
+| `RECAST_INTERVAL` | 60| How often (in seconds) the script should check the cast, and recast if it is idle.|
 
 `DEVICE_TO_URL` should be set as a singular string. You can chain multiple devices by separating them with a comma, in the following format:
 
@@ -34,13 +35,15 @@ For example, for a Bitfocus emulator defined in your Companion app:
 ## Help
 If you are unsure if your container can see your devices, or what their IP addresses are, restart the container and check the logs. 
 
-A scan is done on every boot of the container:
+A network scan is done on every boot:
 
 ```
 Scanning Chromecasts...
 192.168.20.18 - Bedroom Display - Google Inc. Google Nest Hub
 192.168.20.22 - Living Display - Google Inc. Google Nest Hub
 ```
+
+It is **highly recommended** that you set a static IP for your devices if not done already, as they may change.
 
 ## Authors
 
