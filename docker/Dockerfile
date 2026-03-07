@@ -10,16 +10,19 @@ RUN apt-get update && apt-get install -y \
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 ENV PYTHONUNBUFFERED=1
 ENV UV_PROJECT_ENVIRONMENT="/usr/local"
+
 WORKDIR /app
+
+# Copy dependency files from root.
 COPY pyproject.toml uv.lock ./
 RUN uv sync --no-dev --no-install-project
-COPY . . 
+COPY src/ ./src/
 
-# Create a symlink pointing expected catt config ->  unraid config
+# Create a symlink pointing expected catt config -> unraid config.
 RUN mkdir -p /root/.config
 RUN ln -s /config /root/.config/catt
 
-# Run the container.
-COPY entrypoint.sh /entrypoint.sh
+# Run container.
+COPY docker/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]

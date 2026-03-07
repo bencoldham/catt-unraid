@@ -1,6 +1,8 @@
 services:
   catt-app:
-    build: .
+    build:
+      context: .. 
+      dockerfile: docker/Dockerfile
     container_name: catt-dev
     network_mode: host
     volumes:
