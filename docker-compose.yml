@@ -1,0 +1,10 @@
+services:
+  catt-app:
+    build: .
+    container_name: catt-dev
+    network_mode: host
+    volumes:
+      - ./config_test:/config
+      - ./src:/app
+    environment:
+      - PYTHONUNBUFFERED=1
