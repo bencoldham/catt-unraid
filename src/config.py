@@ -1,3 +1,5 @@
+"""Config handler; not currently in use."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass

@@ -37,16 +37,20 @@ class CastDevice:
 
     def cast(self) -> None:
         """Cast the url to the device."""
-        logger.info(f"Casting {self.url} to {self.device_ip}.")
         self.controller.load_url(self.url)
 
     def kill_if_idle(self) -> None:
         """Kill the non-url apps on the device."""
+        if self.controller._is_idle:  # noqa: SLF001
+            msg = f"{self.device_ip} is not on url or is idle. \
+                     Killing the non-url app and recasting."
+            logger.info(msg)
         self.controller.kill(idle_only=True)
 
     def force_restart(self) -> None:
         """Force kill the existing cast for fresh state."""
-        self.controller.kill(force=True)
+        logger.info(f"Clearing {self.device_ip}.")
+        self.controller.prep_app()
         time.sleep(5)
 
 
@@ -66,6 +70,8 @@ class CastManager:
 
     def safe_loop(self, device: CastDevice) -> None:
         """Continuously loop a single thread, recovering if lost."""
+        msg = f"Casting {device.url} to {device.device_ip}."
+        logger.info(msg)
         while True:
             try:
                 self.recast_device(device)
