@@ -23,6 +23,7 @@ class CastDevice:
         """Attempt connection to the device."""
         if not getattr(self, "controller", None):
             try:
+                self.force_restart()
                 self.controller = setup_cast(
                     self.device_ip,
                     controller="dashcast",
@@ -30,7 +31,6 @@ class CastDevice:
                     prep="app",
                 )  # pyright: ignore[reportAttributeAccessIssue]
                 logger.info(f"Successfully connected to {self.device_ip}.")
-                self.force_restart()
             except Exception as e:
                 logger.error(f"Could not connect to {self.device_ip}. {e}")
                 raise ConnectionError(e) from e
