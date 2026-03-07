@@ -16,4 +16,4 @@ RUN ln -s /config /root/.config/catt
 # Run container.
 COPY src/ .
 EXPOSE 5000
-CMD ["python", "main.py"] 
+CMD python main.py && tail -f /dev/null
