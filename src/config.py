@@ -13,6 +13,6 @@ def make_cfg_file(config_path: Path) -> None:
 
     else:
         logger.info(f"Config does not exist, making: {config_path}")
-        config_path.mkdir(exist_ok=True)
+        config_path.parent.mkdir(exist_ok=True)
         with config_path.open("w") as f:
             f.write("[options]\n# device = chromecast_name\n\n[aliases]\n# tv = chromecast_name")
