@@ -1,4 +1,4 @@
-# Cast All The Things (CATT) Bitfocus Dashboard/Site Caster
+# CastForce: A Self-Healing Dashboard Orchestrator for Chromecast
 
 Intended to repurpose Nest Hub/Chromecast devices to dedicated virtual kiosks for Bitfocus Companion. However it can be used to continually cast any URL.
 
